@@ -134,64 +134,6 @@ int main(void)
 {
     /* set LED0 pin mode to output */
     rt_pin_mode(LED0_PIN, PIN_MODE_OUTPUT);
-#ifdef RT_USING_WIFI
-    /* init Wi-Fi auto connect feature */
-    wlan_autoconnect_init();
-    /* enable auto reconnect on WLAN device */
-    rt_wlan_config_autoreconnect(RT_TRUE);
-#endif
-    uint32_t i = 0;
-    //    NAND_IDTypeDef id={0,0,0,0,0};
-    //    NAND_AddressTypeDef temp;
-    //		MX_FMC_Init();
-    //	  rt_thread_mdelay(100);
-
-    //		HAL_NAND_Reset(&hnand1);
-    //		  rt_thread_mdelay(100);
-    //    LOG_D("reset");
-
-    //    HAL_NAND_Read_ID(&hnand1, &id);
-    //    LOG_D("HAL_id = 0x%X", *((unsigned int *)&id));
-
-    //	for(i = 0; i < NAND_PAGE_SIZE; i++)
-    //    {
-    //        buf[i] = 0xFA;
-    //    }
-    //
-    //    temp.Plane = 0;
-    //    temp.Block = 0;
-    //    temp.Page = 0;
-    //    LOG_D("HAL_NAND_Erase_Block = %d", HAL_NAND_Erase_Block(&hnand1, &temp));
-    //    LOG_D("HAL_NAND_Write_Page_8b = %d", HAL_NAND_Write_Page_8b(&hnand1, &temp, buf, 1));
-    //    rt_memset(buf, 0, NAND_PAGE_SIZE);
-    //    LOG_D("HAL_NAND_Read_Page_8b = %d", HAL_NAND_Read_Page_8b(&hnand1, &temp, buf, 1));
-    //
-    //    for(i = 0; i < NAND_PAGE_SIZE; i++)
-    //    {
-    //        if((i % 5) == 0)  LOG_D("\r\n");
-    //        LOG_D("buf[%04d] = 0x%02X ", i, buf[i]);
-    //    }
-
-    //    if(dfs_mount("filesys", "/","elm",0,0) != 0)  //ע����豸����һ�����Խ��ⲿflash����Ϊϵͳ�Ŀ��豸
-    //		{
-    //		    dfs_mkfs("elm","filesys");
-    ////						LOG_E("mount error try mks");
-
-    ////    if(dfs_mount("filesys", "/","elm",0,0) != 0)  //ע����豸����һ�����Խ��ⲿflash����Ϊϵͳ�Ŀ��豸
-    ////		{
-    ////			LOG_E("mount error");
-    ////		}
-    //		}
-
-    //		sfud_flash_t sfud_dev = NULL;
-    //    sfud_dev = rt_sfud_flash_find_by_dev_name("norflash0");
-    //		uint8_t* buf = rt_malloc(4096);
-    //		    if (sfud_read(sfud_dev, 0, 4096, buf) != SFUD_SUCCESS) {
-    //						LOG_E("error");
-    //
-    //				}
-    //				LOG_HEX("buf",8,buf,4096);
-    //
 
     extern int lx_nor_simulator_test(void);
 
@@ -230,27 +172,27 @@ int main(void)
 //    LOG_D("测试程序结束\r\n");
 
     static uint8_t data[256] ={ 32};
-    HAL_I2C_Master_Seq_Transmit_IT(hi2c2, 0xa0, &(data[0]), 1, I2C_FIRST_FRAME);
-    if(rt_completion_wait(completion, 100)!=RT_EOK){
-    		LOG_E("time out1");
-    }
-    //osDelay(1);
-    // HAL_I2C_Master_Seq_Transmit_IT(hi2c2,0xa1,0xff,1,I2C_LAST_FRAME_NO_STOP);
+//    HAL_I2C_Master_Seq_Transmit_IT(hi2c2, 0xa0, &(data[0]), 1, I2C_FIRST_FRAME);
+//    if(rt_completion_wait(completion, 100)!=RT_EOK){
+//    		LOG_E("time out1");
+//    }
+//    //osDelay(1);
+//    // HAL_I2C_Master_Seq_Transmit_IT(hi2c2,0xa1,0xff,1,I2C_LAST_FRAME_NO_STOP);
 
 
-    HAL_I2C_Master_Seq_Receive_IT(hi2c2, 0xa0, &(data[0]), 128, I2C_FIRST_AND_NEXT_FRAME);
-    if (rt_completion_wait(completion, 100) != RT_EOK)
-    {
-        LOG_E("time out2");
-    }
+//    HAL_I2C_Master_Seq_Receive_IT(hi2c2, 0xa0, &(data[0]), 128, I2C_FIRST_AND_NEXT_FRAME);
+//    if (rt_completion_wait(completion, 100) != RT_EOK)
+//    {
+//        LOG_E("time out2");
+//    }
 
-		HAL_I2C_Master_Seq_Receive_IT(hi2c2, 0xa0, &(data[128]), 128, I2C_LAST_FRAME);
-    if (rt_completion_wait(completion, 100) != RT_EOK)
-    {
-        LOG_E("time out4");
-    }
-		
-		rt_memset(data,0,256);
+//		HAL_I2C_Master_Seq_Receive_IT(hi2c2, 0xa0, &(data[128]), 128, I2C_LAST_FRAME);
+//    if (rt_completion_wait(completion, 100) != RT_EOK)
+//    {
+//        LOG_E("time out4");
+//    }
+//		
+//		rt_memset(data,0,256);
 		//rt_i2c_master_recv(&i2c_drv->i2c_bus,0xa0,0,&(data[0]),256);
 
 //    rt_ssize_t ret;
@@ -293,8 +235,8 @@ int main(void)
     msg[2].len    = 128;
     msg[2].buf    = &data[128];
 
-    ret = rt_i2c_transfer(&i2c_drv->i2c_bus, msg, sizeof(msg)/sizeof(struct rt_i2c_msg));
-
+    ret = rt_i2c_transfer(&i2c_drv->i2c_bus, msg, 3);
+	LOG_D("ret=%d",ret);
     LOG_HEX("data",16,data,sizeof(data));
     while (1)
     {

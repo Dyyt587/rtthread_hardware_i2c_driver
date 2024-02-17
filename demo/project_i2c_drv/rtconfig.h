@@ -3,7 +3,9 @@
 
 /* Automatically generated file; DO NOT EDIT. */
 /* RT-Thread Configuration */
-
+#define BSP_I2C2_RX_USING_DMA
+#define BSP_I2C2_TX_USING_DMA
+#define BSP_USING_I2C2
 /* RT-Thread Kernel */
 
 #define RT_NAME_MAX 8
