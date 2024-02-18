@@ -148,7 +148,7 @@ int main(void)
     hi2c2 = &(i2c_drv->handle);
     // MX_I2C2_Init();
 //    LOG_D("测试程序开始\r\n");
-
+    static uint8_t data[256] ={ 32};
 			int res = AT24CXX_Check();
 //    static uint8_t buff[16];
 //    if (!res)
@@ -171,8 +171,7 @@ int main(void)
 
 //    LOG_D("测试程序结束\r\n");
 
-    static uint8_t data[256] ={ 32};
-//    HAL_I2C_Master_Seq_Transmit_IT(hi2c2, 0xa0, &(data[0]), 1, I2C_FIRST_FRAME);
+//    HAL_I2C_Master_Seq_Transmit_DMA(hi2c2, 0xa0, &(data[0]), 1, I2C_FIRST_FRAME);
 //    if(rt_completion_wait(completion, 100)!=RT_EOK){
 //    		LOG_E("time out1");
 //    }
@@ -180,13 +179,13 @@ int main(void)
 //    // HAL_I2C_Master_Seq_Transmit_IT(hi2c2,0xa1,0xff,1,I2C_LAST_FRAME_NO_STOP);
 
 
-//    HAL_I2C_Master_Seq_Receive_IT(hi2c2, 0xa0, &(data[0]), 128, I2C_FIRST_AND_NEXT_FRAME);
+//    HAL_I2C_Master_Seq_Receive_DMA(hi2c2, 0xa0, &(data[0]), 128, I2C_FIRST_AND_NEXT_FRAME);
 //    if (rt_completion_wait(completion, 100) != RT_EOK)
 //    {
 //        LOG_E("time out2");
 //    }
 
-//		HAL_I2C_Master_Seq_Receive_IT(hi2c2, 0xa0, &(data[128]), 128, I2C_LAST_FRAME);
+//		HAL_I2C_Master_Seq_Receive_DMA(hi2c2, 0xa0, &(data[128]), 128, I2C_LAST_FRAME);
 //    if (rt_completion_wait(completion, 100) != RT_EOK)
 //    {
 //        LOG_E("time out4");
@@ -236,7 +235,7 @@ int main(void)
     msg[2].buf    = &data[128];
 
     ret = rt_i2c_transfer(&i2c_drv->i2c_bus, msg, 3);
-	LOG_D("ret=%d",ret);
+		LOG_D("ret=%d",ret);
     LOG_HEX("data",16,data,sizeof(data));
     while (1)
     {

@@ -188,7 +188,7 @@ static int SDRAM_Init(void)
 
     return result;
 }
-INIT_BOARD_EXPORT(SDRAM_Init);
+INIT_CORE_EXPORT(SDRAM_Init);
 
 #ifdef DRV_DEBUG
 #ifdef FINSH_USING_MSH

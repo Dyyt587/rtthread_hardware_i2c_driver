@@ -1084,7 +1084,7 @@ int rt_hw_spi_init(void)
     stm32_get_dma_info();
     return rt_hw_spi_bus_init();
 }
-INIT_BOARD_EXPORT(rt_hw_spi_init);
+INIT_CORE_EXPORT(rt_hw_spi_init);
 
 #endif /* BSP_USING_SPI1 || BSP_USING_SPI2 || BSP_USING_SPI3 || BSP_USING_SPI4 || BSP_USING_SPI5 */
 #endif /* BSP_USING_SPI */

@@ -6,6 +6,8 @@
 #define BSP_I2C2_RX_USING_DMA
 #define BSP_I2C2_TX_USING_DMA
 #define BSP_USING_I2C2
+#define BSP_USING_I2C2_SDL_PIN GET_PIN(H,4)
+#define BSP_USING_I2C2_SDA_PIN GET_PIN(H,5)
 /* RT-Thread Kernel */
 
 #define RT_NAME_MAX 8
