@@ -162,15 +162,6 @@ static rt_err_t stm32_i2c_configure(struct rt_i2c_bus_device *bus)
     return stm32_i2c_init(i2c_drv);
 }
 
-static rt_err_t stm32_i2c_try_unlock(struct rt_i2c_bus_device *bus)
-{
-    //	#define BSP_USING_I2C2_SDL_PIN GET_PIN(H,4)
-    // #define BSP_USING_I2C2_SDA_PIN GET_PIN(H,5)
-    if (rt_pin_read(BSP_USING_I2C2_SDL_PIN) == 0)
-    {
-    }
-    return RT_EOK;
-}
 static rt_ssize_t stm32_i2c_master_xfer(struct rt_i2c_bus_device *bus,
                                         struct rt_i2c_msg msgs[],
                                         rt_uint32_t num)
