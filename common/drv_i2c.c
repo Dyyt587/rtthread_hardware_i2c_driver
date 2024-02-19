@@ -5,6 +5,7 @@
  * Change Logs:
  * Date           Author       Notes
  * 2024-02-17     Dyyt587   first version
+ * 2024-02-19     Dyyt587   add dma support,add auto xfsr timeout,add some error rrror recovery(beta)
  */
 
 /*******************************************************************************
@@ -176,6 +177,7 @@ static rt_ssize_t stm32_i2c_master_xfer(struct rt_i2c_bus_device *bus,
 {
     // for stm32 dma may more stability
 #define DMA_TRANS_MIN_LEN 2 /* only buffer length >= DMA_TRANS_MIN_LEN will use DMA mode */
+#define TRANS_TIMEOUT_PERSEC 8 /* per ms will trans nums bytes */
 
     rt_int32_t i, ret;
     struct rt_i2c_msg *msg = msgs;
@@ -192,15 +194,17 @@ static rt_ssize_t stm32_i2c_master_xfer(struct rt_i2c_bus_device *bus,
     i2c_obj = rt_container_of(bus, struct stm32_i2c, i2c_bus);
     completion = &i2c_obj->completion;
     I2C_HandleTypeDef *handle = &i2c_obj->handle;
-    rt_uint32_t timeout = i2c_obj->config->timeout;
+    rt_uint32_t timeout;
     LOG_D("xfer start %d mags", num);
     for (i = 0; i < (num - 1); i++)
     {
         mode = 0;
+
         msg = &msgs[i];
         LOG_D("xfer       msgs[%d] addr=0x%2x buf=0x%x len= 0x%x flags= 0x%x", i, msg->addr, msg->buf, msg->len, msg->flags);
         next_msg = &msgs[i + 1];
         next_flag = next_msg->flags;
+				timeout = msg->len/TRANS_TIMEOUT_PERSEC+1;
         if (next_flag & RT_I2C_NO_START)
         {
             if ((next_flag & RT_I2C_RD) == (msg->flags & RT_I2C_RD))
@@ -240,7 +244,7 @@ static rt_ssize_t stm32_i2c_master_xfer(struct rt_i2c_bus_device *bus,
             }
             if (rt_completion_wait(completion, timeout) != RT_EOK)
             {
-                LOG_E("receive time out");
+                LOG_D("receive time out");
 								goto out;
 
             }
@@ -274,6 +278,7 @@ static rt_ssize_t stm32_i2c_master_xfer(struct rt_i2c_bus_device *bus,
     }
     // 最后的一个包
     msg = &msgs[i];
+		timeout = msg->len/TRANS_TIMEOUT_PERSEC+1;
     if (msg->flags & RT_I2C_NO_STOP)
         mode = I2C_LAST_FRAME_NO_STOP;
     else
@@ -345,7 +350,7 @@ out:
         LOG_D("I2C BUS Error now stoped");
         handle->Instance->CR1 |= I2C_IT_STOPI; // 发送停止信号，防止总线锁死
     }
-		ret=0;
+		ret=i-1;
     return ret;
 }
 
