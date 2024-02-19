@@ -22,7 +22,7 @@
 /* not fully support for I2C4 */
 #if defined(BSP_USING_I2C1) || defined(BSP_USING_I2C2) || defined(BSP_USING_I2C3)
 
-#define DRV_DEBUG
+//#define DRV_DEBUG
 #define LOG_TAG "drv.i2c"
 #include <drv_log.h>
 /*******************************************************************************
@@ -241,6 +241,8 @@ static rt_ssize_t stm32_i2c_master_xfer(struct rt_i2c_bus_device *bus,
             if (rt_completion_wait(completion, timeout) != RT_EOK)
             {
                 LOG_E("receive time out");
+								goto out;
+
             }
         }
         else
@@ -258,12 +260,14 @@ static rt_ssize_t stm32_i2c_master_xfer(struct rt_i2c_bus_device *bus,
             }
             if (ret != RT_EOK)
             {
-                LOG_E("[%s:%d]I2C Write error(%d)!\n", __func__, __LINE__, ret);
+                LOG_D("[%s:%d]I2C Write error(%d)!\n", __func__, __LINE__, ret);
                 goto out;
             }
             if (rt_completion_wait(completion, timeout) != RT_EOK)
             {
-                LOG_E("transmit time out");
+                LOG_D("transmit time out");
+								goto out;
+
             }
         }
         LOG_D("xfer  next msgs[%d] addr=0x%2x buf= 0x%x len= 0x%x flags = 0x%x\r\n", i + 1, next_msg->addr, next_msg->buf, next_msg->len, next_msg->flags);
@@ -290,12 +294,14 @@ static rt_ssize_t stm32_i2c_master_xfer(struct rt_i2c_bus_device *bus,
         }
         if (ret != RT_EOK)
         {
-            LOG_E("[%s:%d]I2C Read error(%d)!\n", __func__, __LINE__, ret);
+            LOG_D("[%s:%d]I2C Read error(%d)!\n", __func__, __LINE__, ret);
             goto out;
         }
         if (rt_completion_wait(completion, timeout) != RT_EOK)
         {
-            LOG_E("receive time out");
+            LOG_D("receive time out");
+						goto out;
+
         }
     }
     else
@@ -313,30 +319,33 @@ static rt_ssize_t stm32_i2c_master_xfer(struct rt_i2c_bus_device *bus,
         }
         if (ret != RT_EOK)
         {
-            LOG_E("[%s:%d]I2C Write error(%d)!\n", __func__, __LINE__, ret);
+            LOG_D("[%s:%d]I2C Write error(%d)!\n", __func__, __LINE__, ret);
             goto out;
         }
         if (rt_completion_wait(completion, timeout) != RT_EOK)
         {
-            LOG_E("transmit time out");
+            LOG_D("transmit time out");
+					  goto out;
+
         }
     }
     ret = num;
     LOG_D("xfer  end  %d mags\r\n", num);
     return ret;
 out:
-    if (ret == HAL_BUSY)
-        handle->Instance->CR1 |= I2C_IT_STOPI; // 发送停止信号，防止总线锁死
+//    if (ret == HAL_BUSY)
+//        handle->Instance->CR1 |= I2C_IT_STOPI; // 发送停止信号，防止总线锁死
     if (handle->ErrorCode == HAL_I2C_ERROR_AF)
     {
-        LOG_E("I2C NACK Error now stoped");
+        LOG_D("I2C NACK Error now stoped");
         handle->Instance->CR1 |= I2C_IT_STOPI; // 发送停止信号，防止总线锁死
     }
     if (handle->ErrorCode == HAL_I2C_ERROR_BERR)
     {
-        LOG_E("I2C BUS Error now stoped");
+        LOG_D("I2C BUS Error now stoped");
         handle->Instance->CR1 |= I2C_IT_STOPI; // 发送停止信号，防止总线锁死
     }
+		ret=0;
     return ret;
 }
 
@@ -483,12 +492,12 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
 {
     if (hi2c->ErrorCode == HAL_I2C_ERROR_AF)
     {
-        LOG_E("I2C NACK Error now stoped");
+        LOG_D("I2C NACK Error now stoped");
         hi2c->Instance->CR1 |= I2C_IT_STOPI; // 发送停止信号，防止总线锁死
     }
     if (hi2c->ErrorCode == HAL_I2C_ERROR_BERR)
     {
-        LOG_E("I2C BUS Error now stoped");
+        LOG_D("I2C BUS Error now stoped");
         hi2c->Instance->CR1 |= I2C_IT_STOPI; // 发送停止信号，防止总线锁死
     }
 }
